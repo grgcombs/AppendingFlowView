@@ -14,6 +14,29 @@ Description
 - Sample application demos the FlowView as a bill in the legislative process. 
 - This is incredibly simplistic, sure, but I'd like to see you come up with something better. (Fork it!) 
 
+How To Use it
+=============
+
+    // in your view controller
+    - (void)viewDidLoad {
+        AppendingFlowView *flowView = [[AppendingFlowView] initWithFrame:CGRectMake(self.bounds)];
+        NSArray *stagesData = [NSArray arrayWithObjects:
+        [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:FlowStageReached] forKey:@"Introduced"],
+        [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:FlowStageReached] forKey:@"House Committee"],
+        [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:FlowStageFailed] forKey:@"House Voted"],
+        [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:FlowStagePending] forKey:@"Senate Committee"],
+        [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:FlowStagePending] forKey:@"Senate Voted"],
+        [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:FlowStagePending] forKey:@"Sent to Governor"],
+        [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:FlowStagePending] forKey:@"Becomes Law"],
+        nil];
+
+        flowView.items = stagesData;
+        [self addSubview:flowView];
+        [flowView release];
+
+        [super viewDidLoad];
+    } 
+
 Technology
 =============
 
@@ -36,4 +59,4 @@ License
 Screenshots
 =========================
 
-- TBD
+![Screenshot](https://github.com/grgcombs/AppendingFlowView/raw/master/screenshot.png "AppendingFlowView")
