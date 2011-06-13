@@ -16,15 +16,40 @@ typedef enum  {
 	FlowStageFailed = 10,
 } AppendingFlowStageType;
 
+@interface AppendingFlowStage : NSObject
+{
+	NSInteger stageNumber_;
+	AppendingFlowStageType stageType_;
+	NSString *defaultCaption_;
+	NSString *customCaption_;
+}
+
+@property (nonatomic) NSInteger stageNumber;
+@property (nonatomic) AppendingFlowStageType stageType;
+@property (nonatomic,copy) NSString *caption;
+
+- (id)initWithStage:(NSInteger)stageNumber 
+		  stageType:(AppendingFlowStageType)stageType 
+			caption:(NSString *)defaultCaption;
+
+- (id)initWithStage:(NSInteger)stageNumber 
+			caption:(NSString *)defaultCaption;
+
+- (BOOL)shouldPromoteTypeTo:(AppendingFlowStageType)newType;
+
+@end
+
+
+
 @interface AppendingFlowView : UIView {
-	NSArray *items_;
+	NSArray *stages_;
 	CGSize connectorSize;
 	CGSize preferredBoxSize;
 	CGSize insetMargin;
 	NSDictionary *stageColors_;
 }
 
-@property (nonatomic,copy) NSArray *items;		// An array of dictionaries, value is an NSNumber of the stage type, key is the title
+@property (nonatomic,copy) NSArray *stages;		// An array of AppendingFlowStages
 
 @property (nonatomic,retain) UIFont *font;
 @property (nonatomic,retain) UIColor *fontColor;

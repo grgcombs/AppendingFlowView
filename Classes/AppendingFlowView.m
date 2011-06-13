@@ -29,7 +29,6 @@ CGFloat maxHeightOfViews(NSArray *views) {
 }
 
 
-
 @interface AppendingFlowView (Private)
 
 - (void)createStageSubviews;
@@ -37,7 +36,7 @@ CGFloat maxHeightOfViews(NSArray *views) {
 @end
 
 @implementation AppendingFlowView
-@synthesize items=items_;
+@synthesize stages=stages_;
 @synthesize stageColors=stageColors_;
 @synthesize fontColor, font;
 @synthesize connectorSize, preferredBoxSize, insetMargin;
@@ -45,7 +44,7 @@ CGFloat maxHeightOfViews(NSArray *views) {
 @synthesize pendingAlpha;
 
 - (void)configure {
-	items_ = nil;
+	stages_ = nil;
 	UIColor *red = [UIColor colorWithRed:0.776f green:0.0f blue:0.184f alpha:1.0];
 	UIColor *blue = [UIColor colorWithRed:0.196f green:0.310f blue:0.522f alpha:1.0];
 	UIColor *green = [UIColor colorWithRed:0.431f green:0.643f blue:0.063f alpha:1.0];
@@ -82,19 +81,18 @@ CGFloat maxHeightOfViews(NSArray *views) {
 	[self configure];
 }
 
-- (void)setItems:(NSArray *)newItems {
-	if (items_) [items_ release];
-	items_ = [newItems copy];
+- (void)setStages:(NSArray *)newStages {
+	if (stages_) [stages_ release];
+	stages_ = [newStages copy];
 
 	[self createStageSubviews];
 	[self setNeedsLayout];
 }
 
-- (UIView *)createConnectorForType:(NSNumber *)statusNumber {
-	AppendingFlowStageType statusType = [statusNumber integerValue];
+- (UIView *)createConnectorForType:(AppendingFlowStageType)stageType {
 	
 	CGRect statusRect = CGRectMake(0.f, 0.f, connectorSize.width, connectorSize.height);	
-	if (statusType == FlowStageFailed) {
+	if (stageType == FlowStageFailed) {
 		statusRect.size.height = 30.f;	// we're doing a symbol, not a box, increase height;
 	}
 	
@@ -103,10 +101,10 @@ CGFloat maxHeightOfViews(NSArray *views) {
 								 UIViewAutoresizingFlexibleRightMargin |
 								 UIViewAutoresizingFlexibleBottomMargin);
 								 
-	statView.alpha = (statusType == FlowStagePending) ? pendingAlpha : 1.f;
-	UIColor *statusColor = [stageColors_ objectForKey:statusNumber];
+	statView.alpha = (stageType == FlowStagePending) ? pendingAlpha : 1.f;
+	UIColor *statusColor = [stageColors_ objectForKey:[NSNumber numberWithInteger:stageType]];
 	
-	if (statusType == FlowStageFailed) {
+	if (stageType == FlowStageFailed) {
 		statView.font = font;
 		statView.text = @"X";
 		statView.shadowColor = [UIColor darkTextColor];
@@ -122,14 +120,15 @@ CGFloat maxHeightOfViews(NSArray *views) {
 	return [statView autorelease];
 }
 
-- (UIView *)createStageBoxForTitle:(NSString *)title status:(NSNumber *)statusNumber {
-	AppendingFlowStageType statusType = [statusNumber integerValue];
-
+- (UIView *)createStageBoxForStage:(AppendingFlowStage *)stage {
+	if (!stage)
+		return nil;
+	
 	CGSize frameSize = preferredBoxSize;
 	
 	if (!uniformWidth || !uniformHeight) {
 		// This grabs the appropriate width/height render the text
-		frameSize = [title sizeWithFont:font 
+		frameSize = [stage.caption sizeWithFont:font 
 							constrainedToSize:preferredBoxSize 
 								lineBreakMode:UILineBreakModeWordWrap];
 		
@@ -150,14 +149,14 @@ CGFloat maxHeightOfViews(NSArray *views) {
 	
 	CGRect statusRect = CGRectMake(0.f, 0.f, frameSize.width, frameSize.height);
 	
-	UIColor *statusColor = [stageColors_ objectForKey:statusNumber];
+	UIColor *statusColor = [stageColors_ objectForKey:[NSNumber numberWithInteger:stage.stageType]];
 	UILabel *aView = [[UILabel alloc] initWithFrame:statusRect];
 	aView.autoresizingMask = (UIViewAutoresizingFlexibleLeftMargin  |
 								 UIViewAutoresizingFlexibleRightMargin |
 								 UIViewAutoresizingFlexibleBottomMargin);
 		
 	aView.backgroundColor = statusColor;
-	aView.text = title;
+	aView.text = stage.caption;
 	aView.numberOfLines = 0;
 	aView.minimumFontSize = font.pointSize - 2.f;	// sensible, right?
 	aView.textAlignment = UITextAlignmentCenter;
@@ -167,7 +166,7 @@ CGFloat maxHeightOfViews(NSArray *views) {
 	aView.shadowOffset = CGSizeMake(0.f, -1.f);
 	aView.textColor = fontColor;
 	aView.font = font;
-	aView.alpha = (statusType == FlowStagePending) ? pendingAlpha : 1.f;
+	aView.alpha = (stage.stageType == FlowStagePending) ? pendingAlpha : 1.f;
 
 	return [aView autorelease];
 }
@@ -179,18 +178,19 @@ CGFloat maxHeightOfViews(NSArray *views) {
 		[sub removeFromSuperview];
 	}
 	
-	for (NSDictionary *item in items_) {		
+	for (AppendingFlowStage *item in stages_) {		
 		// dictionary key is our title, it's value is our status
+				
+		UIView *stageBox = [self createStageBoxForStage:item];
+		if (stageBox) {
+			[self addSubview:stageBox];
+		}
 		
-		NSString *title = [[item allKeys] objectAtIndex:0]; // assume only one value/key pair
-		NSNumber *status = [item valueForKey:title];			
-		
-		UIView *stageBox = [self createStageBoxForTitle:title status:status];
-		[self addSubview:stageBox];
-		
-		if (NO == [item isEqual:[items_ lastObject]]) {
-			UIView *statusView = [self createConnectorForType:status];
-			[self addSubview:statusView];
+		if (NO == [item isEqual:[stages_ lastObject]]) {
+			UIView *statusView = [self createConnectorForType:item.stageType];
+			if (statusView) {
+				[self addSubview:statusView];
+			}
 		}
 	}
 	//[self setNeedsDisplay];
@@ -275,7 +275,7 @@ CGFloat maxHeightOfViews(NSArray *views) {
 }
 
 - (void)dealloc {
-	self.items = nil;
+	self.stages = nil;
 	self.stageColors = nil;
 	self.font = nil;
 	self.fontColor = nil;
@@ -284,3 +284,72 @@ CGFloat maxHeightOfViews(NSArray *views) {
 
 
 @end
+
+#pragma mark -
+#pragma mark AppendingFlowStage
+#pragma mark -
+
+@implementation AppendingFlowStage
+@synthesize stageNumber=stageNumber_;
+@synthesize stageType=stageType_;
+
+- (id)initWithStage:(NSInteger)stageNumber 
+		  stageType:(AppendingFlowStageType)stageType 
+			caption:(NSString *)defaultCaption {
+	
+	if ((self=[super init])) {
+		stageNumber_ = stageNumber;
+		stageType_ = stageType;
+		
+		defaultCaption_ = [defaultCaption copy];
+	}
+	return self;
+}
+
+- (id)initWithStage:(NSInteger)stageNumber 
+			caption:(NSString *)defaultCaption {
+	
+	return [self initWithStage:stageNumber 
+					 stageType:FlowStagePending 
+					   caption:defaultCaption];
+}
+
+- (void)dealloc {
+	if (defaultCaption_)
+		[defaultCaption_ release], defaultCaption_ = nil;
+	if (customCaption_)
+		[customCaption_ release], customCaption_ = nil;
+}
+
+- (NSString *)caption {
+	if (customCaption_ && [customCaption_ length])
+		return customCaption_;
+	else
+		return defaultCaption_;
+}
+
+- (void)setCaption:(NSString *)newCaption {
+	if (customCaption_)
+		[customCaption_ release];
+	customCaption_ = [newCaption copy];
+}
+
+- (BOOL)shouldPromoteTypeTo:(AppendingFlowStageType)newType {
+	BOOL shouldPromote = NO;
+	
+	// new status set to pending is an invalid demotion, so no.
+	// if we're pending now, we can be promoted
+	// can you go from failed to reached? ... let's say yes.
+	
+	if (newType > stageType_)
+		shouldPromote = YES;
+	else if ((stageType_ == FlowStageFailed) &&
+			 (newType == FlowStageReached))
+		shouldPromote = YES;
+	
+	return shouldPromote;
+}
+
+@end
+
+
