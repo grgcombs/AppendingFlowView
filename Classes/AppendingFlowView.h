@@ -62,3 +62,7 @@ typedef enum  {
 // standardize on a suitable width / height for all stages in the flow view, for visual appeal or (inverse = compactness)
 @property (nonatomic) BOOL uniformWidth, uniformHeight;
 @end
+
+CGFloat widthOfViews(NSArray *views);
+CGFloat maxHeightOfViews(NSArray *views);
+
