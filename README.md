@@ -20,19 +20,47 @@ How To Use it
     // in your view controller
     - (void)viewDidLoad {
         AppendingFlowView *flowView = [[AppendingFlowView] initWithFrame:CGRectMake(self.bounds)];
-        NSArray *stagesData = [NSArray arrayWithObjects:
-        [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:FlowStageReached] forKey:@"Introduced"],
-        [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:FlowStageReached] forKey:@"House Committee"],
-        [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:FlowStageFailed] forKey:@"House Voted"],
-        [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:FlowStagePending] forKey:@"Senate Committee"],
-        [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:FlowStagePending] forKey:@"Senate Voted"],
-        [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:FlowStagePending] forKey:@"Sent to Governor"],
-        [NSDictionary dictionaryWithObject:[NSNumber numberWithInt:FlowStagePending] forKey:@"Becomes Law"],
-        nil];
-
-        flowView.items = stagesData;
-        [self addSubview:flowView];
+        AppendingFlowStage *stage1, *stage2, *stage3, *stage4, *stage5, *stage6, *stage7;
+        
+        stage1 = [[AppendingFlowStage alloc] initWithStage:1 
+        			stageType:FlowStageReached 
+        			caption:NSLocalizedStringFromTable(@"Stage1", @"DemoStages", @"")];
+        stage2 = [[AppendingFlowStage alloc] initWithStage:2 
+        			stageType:FlowStageReached 
+        			caption:NSLocalizedStringFromTable(@"Stage2", @"DemoStages", @"")];
+        stage3 = [[AppendingFlowStage alloc] initWithStage:3 
+        			stageType:FlowStageReached 
+        			caption:NSLocalizedStringFromTable(@"Stage3", @"DemoStages", @"")];
+        stage4 = [[AppendingFlowStage alloc] initWithStage:4 
+        			stageType:FlowStageFailed 
+        			caption:NSLocalizedStringFromTable(@"Stage4", @"DemoStages", @"")];
+        stage5 = [[AppendingFlowStage alloc] initWithStage:5 
+        			caption:NSLocalizedStringFromTable(@"Stage5", @"DemoStages", @"")];
+        stage6 = [[AppendingFlowStage alloc] initWithStage:6 
+        			caption:NSLocalizedStringFromTable(@"Stage6", @"DemoStages", @"")];
+        stage7 = [[AppendingFlowStage alloc] initWithStage:7 
+        			caption:NSLocalizedStringFromTable(@"Stage7", @"DemoStages", @"")];
+        
+        NSArray *stages = [[NSArray alloc] initWithObjects:stage1, stage2, stage3, stage4, stage5, stage6, stage7, nil];
+        
+        flowView.font = [self.flowView.font fontWithSize:12.f];
+        flowView.preferredBoxSize = CGSizeMake(65.f, 35.f);
+        flowView.connectorSize = CGSizeMake(16.f, 6.f);
+        flowView.uniformWidth = YES;
+        flowView.pendingAlpha = 0.6f;
+        flowView.stages = stages;
+        
+        [self.view addSubview:flowView];
         [flowView release];
+        
+        [stage1 release];
+        [stage2 release]; 
+        [stage3 release];
+        [stage4 release];
+        [stage5 release];
+        [stage6 release];
+        [stage7 release];
+        [stages release];
 
         [super viewDidLoad];
     } 
