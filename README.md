@@ -19,7 +19,7 @@ How To Use it
 
     // in your view controller
     - (void)viewDidLoad {
-        AppendingFlowView *flowView = [[AppendingFlowView] initWithFrame:CGRectMake(self.bounds)];
+        AppendingFlowView *flowView = [[AppendingFlowView] initWithFrame:CGRectMake(self.view.bounds)];
         AppendingFlowStage *stage1, *stage2, *stage3, *stage4, *stage5, *stage6, *stage7;
         
         stage1 = [[AppendingFlowStage alloc] initWithStage:1 
