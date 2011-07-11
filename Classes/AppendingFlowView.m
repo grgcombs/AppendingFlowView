@@ -3,8 +3,8 @@
 //
 //  AppendingFlowView by Gregory S. Combs, based on work at https://github.com/grgcombs/AppendingFlowView
 //
-//  This work is licensed under the Creative Commons Attribution-ShareAlike 3.0 Unported License. 
-//  To view a copy of this license, visit http://creativecommons.org/licenses/by-sa/3.0/
+//  This work is licensed under the Creative Commons Attribution 3.0 Unported License. 
+//  To view a copy of this license, visit http://creativecommons.org/licenses/by/3.0/
 //  or send a letter to Creative Commons, 444 Castro Street, Suite 900, Mountain View, California, 94041, USA.
 //
 
@@ -36,7 +36,7 @@ CGFloat maxHeightOfViews(NSArray *views) {
 @end
 
 @implementation AppendingFlowView
-@synthesize stages=stages_;
+@synthesize stages=_stages;
 @synthesize stageColors=stageColors_;
 @synthesize fontColor, font;
 @synthesize connectorSize, preferredBoxSize, insetMargin;
@@ -44,7 +44,7 @@ CGFloat maxHeightOfViews(NSArray *views) {
 @synthesize pendingAlpha;
 
 - (void)configure {
-	stages_ = nil;
+	_stages = nil;
 	UIColor *red = [UIColor colorWithRed:0.776f green:0.0f blue:0.184f alpha:1.0];
 	UIColor *blue = [UIColor colorWithRed:0.196f green:0.310f blue:0.522f alpha:1.0];
 	UIColor *green = [UIColor colorWithRed:0.431f green:0.643f blue:0.063f alpha:1.0];
@@ -82,8 +82,8 @@ CGFloat maxHeightOfViews(NSArray *views) {
 }
 
 - (void)setStages:(NSArray *)newStages {
-	if (stages_) [stages_ release];
-	stages_ = [newStages copy];
+	if (_stages) [_stages release];
+	_stages = [newStages copy];
 
 	[self createStageSubviews];
 	[self setNeedsLayout];
@@ -178,7 +178,7 @@ CGFloat maxHeightOfViews(NSArray *views) {
 		[sub removeFromSuperview];
 	}
 	
-	for (AppendingFlowStage *item in stages_) {		
+	for (AppendingFlowStage *item in _stages) {		
 		// dictionary key is our title, it's value is our status
 				
 		UIView *stageBox = [self createStageBoxForStage:item];
@@ -186,7 +186,7 @@ CGFloat maxHeightOfViews(NSArray *views) {
 			[self addSubview:stageBox];
 		}
 		
-		if (NO == [item isEqual:[stages_ lastObject]]) {
+		if (NO == [item isEqual:[_stages lastObject]]) {
 			UIView *statusView = [self createConnectorForType:item.stageType];
 			if (statusView) {
 				[self addSubview:statusView];
@@ -275,10 +275,13 @@ CGFloat maxHeightOfViews(NSArray *views) {
 }
 
 - (void)dealloc {
-	self.stages = nil;
 	self.stageColors = nil;
 	self.font = nil;
 	self.fontColor = nil;
+	if (_stages) {
+		[_stages release];
+		_stages = nil;
+	}
     [super dealloc];
 }
 
@@ -319,6 +322,7 @@ CGFloat maxHeightOfViews(NSArray *views) {
 		[defaultCaption_ release], defaultCaption_ = nil;
 	if (customCaption_)
 		[customCaption_ release], customCaption_ = nil;
+	[super dealloc];
 }
 
 - (NSString *)caption {
@@ -330,8 +334,9 @@ CGFloat maxHeightOfViews(NSArray *views) {
 
 - (void)setCaption:(NSString *)newCaption {
 	if (customCaption_)
-		[customCaption_ release];
-	customCaption_ = [newCaption copy];
+		[customCaption_ release], customCaption_ = nil;
+	if (newCaption)
+		customCaption_ = [newCaption copy];
 }
 
 - (BOOL)shouldPromoteTypeTo:(AppendingFlowStageType)newType {
