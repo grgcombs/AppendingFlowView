@@ -45,14 +45,13 @@ CGFloat maxHeightOfViews(NSArray *views) {
 	UIColor *red = [UIColor colorWithRed:0.776f green:0.0f blue:0.184f alpha:1.0];
 	UIColor *blue = [UIColor colorWithRed:0.196f green:0.310f blue:0.522f alpha:1.0];
 	UIColor *green = [UIColor colorWithRed:0.431f green:0.643f blue:0.063f alpha:1.0];
-	//UIColor *gray = [UIColor darkGrayColor];
 	
 	_stageColors = [[NSDictionary alloc] initWithObjectsAndKeys:
 					red, [NSNumber numberWithInteger:FlowStageFailed],
 					blue, [NSNumber numberWithInteger:FlowStagePending],
 					green, [NSNumber numberWithInteger:FlowStageReached], nil];
 
-	font = [[UIFont fontWithName:@"HelveticaNeue-Bold" size:14.f] retain];
+	font = [[UIFont boldSystemFontOfSize:12] retain];
 	fontColor = [[UIColor colorWithRed:0.863 green:0.894 blue:0.922 alpha:1.000] retain];	
 	pendingAlpha = 0.4f;
 	connectorSize = CGSizeMake(30.f, 6.f);	// on iphone it's 7px wide, not 30px
@@ -88,9 +87,6 @@ CGFloat maxHeightOfViews(NSArray *views) {
 - (UIView *)createConnectorForType:(AppendingFlowStageType)stageType {
 	
 	CGRect statusRect = CGRectMake(0.f, 0.f, connectorSize.width, connectorSize.height);	
-	if (stageType == FlowStageFailed) {
-		statusRect.size.height = 30.f;	// we're doing a symbol, not a box, increase height;
-	}
 	
 	UILabel *statView = [[UILabel alloc] initWithFrame:statusRect];
 	statView.autoresizingMask = (UIViewAutoresizingFlexibleLeftMargin | UIViewAutoresizingFlexibleRightMargin | UIViewAutoresizingFlexibleBottomMargin);
@@ -98,17 +94,7 @@ CGFloat maxHeightOfViews(NSArray *views) {
 	statView.alpha = (stageType == FlowStagePending) ? pendingAlpha : 1.f;
 	UIColor *statusColor = [_stageColors objectForKey:[NSNumber numberWithInteger:stageType]];
     statView.backgroundColor = statusColor;
-    
-	if (stageType == FlowStageFailed) {
-		statView.font = font;
-		statView.text = @"X";
-		statView.shadowColor = [UIColor darkTextColor];
-		statView.shadowOffset = CGSizeMake(0.f, -1.f);
-		statView.textAlignment = UITextAlignmentCenter;
-		statView.adjustsFontSizeToFitWidth = YES;
-		statView.textColor = statusColor;
-		statView.backgroundColor = [UIColor clearColor];
-	}
+    statView.hidden = (stageType == FlowStageFailed);
 	return [statView autorelease];
 }
 
@@ -141,16 +127,16 @@ CGFloat maxHeightOfViews(NSArray *views) {
 		
 	aView.backgroundColor = statusColor;
 	aView.text = stage.caption;
-	aView.numberOfLines = 0;
+	aView.numberOfLines = 2;
 	aView.minimumFontSize = font.pointSize - 2.f;	// sensible, right?
 	aView.textAlignment = UITextAlignmentCenter;
 	aView.lineBreakMode = UILineBreakModeWordWrap;
 	aView.adjustsFontSizeToFitWidth = YES;
-	aView.shadowColor = [UIColor darkTextColor];
-	aView.shadowOffset = CGSizeMake(0.f, -1.f);
+    aView.shadowColor = [[UIColor blackColor] colorWithAlphaComponent:.8];
+    aView.shadowOffset = CGSizeMake(0.f, 1.f);
 	aView.textColor = fontColor;
 	aView.font = font;
-	aView.alpha = (stage.stageType == FlowStagePending) ? pendingAlpha : 1.f;
+    aView.alpha = (stage.stageType == FlowStagePending) ? pendingAlpha : 1.f;
 
 	return [aView autorelease];
 }
