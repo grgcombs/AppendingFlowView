@@ -51,8 +51,8 @@ CGFloat maxHeightOfViews(NSArray *views) {
 					blue, [NSNumber numberWithInteger:FlowStagePending],
 					green, [NSNumber numberWithInteger:FlowStageReached], nil];
 
-	font = [[UIFont boldSystemFontOfSize:12] retain];
-	fontColor = [[UIColor colorWithRed:0.863 green:0.894 blue:0.922 alpha:1.000] retain];	
+	font = [UIFont boldSystemFontOfSize:12];
+	fontColor = [UIColor colorWithRed:0.863 green:0.894 blue:0.922 alpha:1.000];	
 	pendingAlpha = 0.4f;
 	connectorSize = CGSizeMake(30.f, 6.f);	// on iphone it's 7px wide, not 30px
 	preferredBoxSize = CGSizeMake(96.f, 43.f);	
@@ -75,8 +75,6 @@ CGFloat maxHeightOfViews(NSArray *views) {
 }
 
 - (void)setStages:(NSArray *)newStages {
-	if (_stages)
-        [_stages release];
 	_stages = [newStages copy];
     if (newStages) {
         [self createStageSubviews];
@@ -95,7 +93,7 @@ CGFloat maxHeightOfViews(NSArray *views) {
 	UIColor *statusColor = [_stageColors objectForKey:[NSNumber numberWithInteger:stageType]];
     statView.backgroundColor = statusColor;
     statView.hidden = (stageType == FlowStageFailed);
-	return [statView autorelease];
+	return statView;
 }
 
 - (UIView *)createStageBoxForStage:(AppendingFlowStage *)stage {
@@ -138,7 +136,7 @@ CGFloat maxHeightOfViews(NSArray *views) {
 	aView.font = font;
     aView.alpha = (stage.stageType == FlowStagePending) ? pendingAlpha : 1.f;
 
-	return [aView autorelease];
+	return aView;
 }
 
 - (void)createStageSubviews {	
@@ -191,14 +189,12 @@ CGFloat maxHeightOfViews(NSArray *views) {
 				// we can't fit it on this row, so add our old row to our table, then create a new row
 				rowWidth = 0.f;
 				[rows addObject:row];
-				[row release];
 				row = [[NSMutableArray alloc] init];					
 			}
 			rowWidth+=subWidth;
 			[row addObject:sub];	// add the view to our current row
 		}
 		[rows addObject:row];	// add the row to our table
-		[row release];
 	}
 	
 	NSInteger rowCount = MAX(1,[rows count]); // prevent divide by zero in case we screw this up
@@ -235,18 +231,13 @@ CGFloat maxHeightOfViews(NSArray *views) {
 		rowIndex++;
 	}
 	
-	[rows release];
 		
 	[UIView commitAnimations];
 	[super layoutSubviews];
 }
 
 - (void)dealloc {
-	self.stageColors = nil;
-	self.font = nil;
-	self.fontColor = nil;
     self.stages = nil;
-    [super dealloc];
 }
 
 @end
@@ -269,7 +260,7 @@ CGFloat maxHeightOfViews(NSArray *views) {
 }
 
 + (AppendingFlowStage *)stageWithNumber:(NSInteger)stageNumber type:(AppendingFlowStageType)stageType caption:(NSString *)defaultCaption {
-    return [[[AppendingFlowStage alloc] initWithStage:stageNumber stageType:stageType caption:defaultCaption] autorelease];
+    return [[AppendingFlowStage alloc] initWithStage:stageNumber stageType:stageType caption:defaultCaption];
 }
 
 - (id)initWithStage:(NSInteger)stageNumber stageType:(AppendingFlowStageType)stageType caption:(NSString *)defaultCaption {
@@ -282,11 +273,6 @@ CGFloat maxHeightOfViews(NSArray *views) {
 	return self;
 }
 
-- (void)dealloc {
-    self.defaultCaption = nil;
-    self.customCaption = nil;
-	[super dealloc];
-}
 
 - (NSString *)caption {
 	if (_customCaption && [_customCaption length])
@@ -297,7 +283,7 @@ CGFloat maxHeightOfViews(NSArray *views) {
 
 - (void)setCaption:(NSString *)newCaption {
 	if (_customCaption)
-		[_customCaption release], _customCaption = nil;
+		_customCaption = nil;
 	if (newCaption)
 		_customCaption = [newCaption copy];
 }
