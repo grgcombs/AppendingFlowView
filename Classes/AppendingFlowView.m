@@ -78,6 +78,7 @@ CGFloat maxHeightOfViews(NSArray *views) {
 }
 
 - (void)awakeFromNib {
+    [super awakeFromNib];
 	[self configure];
 }
 
