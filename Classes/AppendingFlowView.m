@@ -51,9 +51,9 @@ CGFloat maxHeightOfViews(NSArray *views) {
 	//UIColor *gray = [UIColor darkGrayColor];
 	
 	stageColors_ = [[NSDictionary alloc] initWithObjectsAndKeys:
-					red, [NSNumber numberWithInteger:FlowStageFailed],
-					blue, [NSNumber numberWithInteger:FlowStagePending],
-					green, [NSNumber numberWithInteger:FlowStageReached],
+					red, @(FlowStageFailed),
+					blue, @(FlowStagePending),
+					green, @(FlowStageReached),
 					nil];
 
 	font = [[UIFont fontWithName:@"HelveticaNeue-Bold" size:14.f] retain];
@@ -68,7 +68,7 @@ CGFloat maxHeightOfViews(NSArray *views) {
 	
 }
 
-- (id)initWithFrame:(CGRect)frame {
+- (instancetype)initWithFrame:(CGRect)frame {
     
     self = [super initWithFrame:frame];
     if (self) {
@@ -103,7 +103,7 @@ CGFloat maxHeightOfViews(NSArray *views) {
 								 UIViewAutoresizingFlexibleBottomMargin);
 								 
 	statView.alpha = (stageType == FlowStagePending) ? pendingAlpha : 1.f;
-	UIColor *statusColor = [stageColors_ objectForKey:[NSNumber numberWithInteger:stageType]];
+	UIColor *statusColor = stageColors_[@(stageType)];
 	
 	if (stageType == FlowStageFailed) {
 		statView.font = font;
@@ -150,7 +150,7 @@ CGFloat maxHeightOfViews(NSArray *views) {
 	
 	CGRect statusRect = CGRectMake(0.f, 0.f, frameSize.width, frameSize.height);
 	
-	UIColor *statusColor = [stageColors_ objectForKey:[NSNumber numberWithInteger:stage.stageType]];
+	UIColor *statusColor = stageColors_[@(stage.stageType)];
 	UILabel *aView = [[UILabel alloc] initWithFrame:statusRect];
 	aView.autoresizingMask = (UIViewAutoresizingFlexibleLeftMargin  |
 								 UIViewAutoresizingFlexibleRightMargin |
@@ -187,7 +187,7 @@ CGFloat maxHeightOfViews(NSArray *views) {
 			[self addSubview:stageBox];
 		}
 		
-		if (NO == [item isEqual:[_stages lastObject]]) {
+		if (NO == [item isEqual:_stages.lastObject]) {
 			UIView *statusView = [self createConnectorForType:item.stageType];
 			if (statusView) {
 				[self addSubview:statusView];
@@ -198,7 +198,7 @@ CGFloat maxHeightOfViews(NSArray *views) {
 }
 
 - (void)layoutSubviews {
-	NSInteger subCount = [self.subviews count];
+	NSInteger subCount = (self.subviews).count;
 	if (subCount == 0)
 		return;
 
@@ -297,7 +297,7 @@ CGFloat maxHeightOfViews(NSArray *views) {
 @synthesize stageNumber=stageNumber_;
 @synthesize stageType=stageType_;
 
-- (id)initWithStage:(NSInteger)stageNumber 
+- (instancetype)initWithStage:(NSInteger)stageNumber 
 		  stageType:(AppendingFlowStageType)stageType 
 			caption:(NSString *)defaultCaption {
 	
@@ -310,7 +310,7 @@ CGFloat maxHeightOfViews(NSArray *views) {
 	return self;
 }
 
-- (id)initWithStage:(NSInteger)stageNumber 
+- (instancetype)initWithStage:(NSInteger)stageNumber 
 			caption:(NSString *)defaultCaption {
 	
 	return [self initWithStage:stageNumber 
@@ -327,7 +327,7 @@ CGFloat maxHeightOfViews(NSArray *views) {
 }
 
 - (NSString *)caption {
-	if (customCaption_ && [customCaption_ length])
+	if (customCaption_ && customCaption_.length)
 		return customCaption_;
 	else
 		return defaultCaption_;

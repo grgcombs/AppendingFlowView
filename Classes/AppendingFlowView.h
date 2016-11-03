@@ -10,11 +10,11 @@
 
 #import <UIKit/UIKit.h>
 
-typedef enum  {
+typedef NS_ENUM(unsigned int, AppendingFlowStageType) {
 	FlowStagePending = 0,
 	FlowStageReached = 1,
 	FlowStageFailed = 10,
-} AppendingFlowStageType;
+};
 
 @interface AppendingFlowStage : NSObject
 {
@@ -28,11 +28,11 @@ typedef enum  {
 @property (nonatomic) AppendingFlowStageType stageType;
 @property (nonatomic,copy) NSString *caption;
 
-- (id)initWithStage:(NSInteger)stageNumber 
+- (instancetype)initWithStage:(NSInteger)stageNumber 
 		  stageType:(AppendingFlowStageType)stageType 
 			caption:(NSString *)defaultCaption;
 
-- (id)initWithStage:(NSInteger)stageNumber 
+- (instancetype)initWithStage:(NSInteger)stageNumber 
 			caption:(NSString *)defaultCaption;
 
 - (BOOL)shouldPromoteTypeTo:(AppendingFlowStageType)newType;
