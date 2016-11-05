@@ -51,8 +51,8 @@ typedef NS_ENUM(unsigned int, AppendingFlowStageType) {
 
 @property (nonatomic,copy) NSArray *stages;		// An array of AppendingFlowStages
 
-@property (nonatomic,retain) UIFont *font;
-@property (nonatomic,retain) UIColor *fontColor;
+@property (nonatomic,strong) UIFont *font;
+@property (nonatomic,strong) UIColor *fontColor;
 @property (nonatomic,copy) NSDictionary *stageColors;	// [NSNumber numberWithInt:FlowStageFailed] = [UIColor redColor]
 @property (nonatomic) CGSize connectorSize;		// desired size for the connecting lines between boxes
 @property (nonatomic) CGSize preferredBoxSize;			// desired size for the stage boxes w/text

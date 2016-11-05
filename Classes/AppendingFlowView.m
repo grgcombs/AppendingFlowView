@@ -56,8 +56,8 @@ CGFloat maxHeightOfViews(NSArray *views) {
 					green, @(FlowStageReached),
 					nil];
 
-	font = [[UIFont fontWithName:@"HelveticaNeue-Bold" size:14.f] retain];
-	fontColor = [[UIColor colorWithRed:0.863 green:0.894 blue:0.922 alpha:1.000] retain];	
+	font = [UIFont fontWithName:@"HelveticaNeue-Bold" size:14.f];
+	fontColor = [UIColor colorWithRed:0.863 green:0.894 blue:0.922 alpha:1.000];	
 	
 	pendingAlpha = 0.4f;
 	connectorSize = CGSizeMake(30.f, 6.f);	// on iphone it's 7px wide, not 30px
@@ -83,7 +83,6 @@ CGFloat maxHeightOfViews(NSArray *views) {
 }
 
 - (void)setStages:(NSArray *)newStages {
-	if (_stages) [_stages release];
 	_stages = [newStages copy];
 
 	[self createStageSubviews];
@@ -118,7 +117,7 @@ CGFloat maxHeightOfViews(NSArray *views) {
 		statView.backgroundColor = statusColor;
 	}
 
-	return [statView autorelease];
+	return statView;
 }
 
 - (UIView *)createStageBoxForStage:(AppendingFlowStage *)stage {
@@ -169,7 +168,7 @@ CGFloat maxHeightOfViews(NSArray *views) {
 	aView.font = font;
 	aView.alpha = (stage.stageType == FlowStagePending) ? pendingAlpha : 1.f;
 
-	return [aView autorelease];
+	return aView;
 }
 
 - (void)createStageSubviews {	
@@ -224,14 +223,12 @@ CGFloat maxHeightOfViews(NSArray *views) {
 				// we can't fit it on this row, so add our old row to our table, then create a new row
 				rowWidth = 0.f;
 				[rows addObject:row];
-				[row release];
 				row = [[NSMutableArray alloc] init];					
 			}
 			rowWidth+=subWidth;
 			[row addObject:sub];	// add the view to our current row
 		}
 		[rows addObject:row];	// add the row to our table
-		[row release];
 	}
 	
 	NSInteger rowCount = MAX(1,[rows count]); // prevent divide by zero in case we screw this up
@@ -268,7 +265,6 @@ CGFloat maxHeightOfViews(NSArray *views) {
 		rowIndex++;
 	}
 	
-	[rows release];
 		
 	[UIView commitAnimations];
 
@@ -276,14 +272,9 @@ CGFloat maxHeightOfViews(NSArray *views) {
 }
 
 - (void)dealloc {
-	self.stageColors = nil;
-	self.font = nil;
-	self.fontColor = nil;
 	if (_stages) {
-		[_stages release];
 		_stages = nil;
 	}
-    [super dealloc];
 }
 
 
@@ -320,10 +311,9 @@ CGFloat maxHeightOfViews(NSArray *views) {
 
 - (void)dealloc {
 	if (defaultCaption_)
-		[defaultCaption_ release], defaultCaption_ = nil;
+		defaultCaption_ = nil;
 	if (customCaption_)
-		[customCaption_ release], customCaption_ = nil;
-	[super dealloc];
+		customCaption_ = nil;
 }
 
 - (NSString *)caption {
@@ -335,7 +325,7 @@ CGFloat maxHeightOfViews(NSArray *views) {
 
 - (void)setCaption:(NSString *)newCaption {
 	if (customCaption_)
-		[customCaption_ release], customCaption_ = nil;
+		customCaption_ = nil;
 	if (newCaption)
 		customCaption_ = [newCaption copy];
 }
